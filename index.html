@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta name="author" content="webaraclar.tk">
+	<link  rel="stylesheet" href="css/bootstrap.min.css">
+	<!-- <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous"> -->
+    <title>Date Calculation and Countdown Tools</title>
+	<style>
+		button, label{
+			margin: 5px;
+		}
+		p{
+			margin: 3px;
+		}
+	</style>
+</head>
+<body style="background-color: bisque;">
+<h1 style="text-align:center; background-color:burlywood;">Date Calculation and Countdown Tools</h1>
+<div id="ana_govde" class="container-fluid">
+    <div class="row">
+        <div id="kac_gun" class="col  col-sm-3 border border-primary border-4 mx-1 my-1">
+			</center>
+				<h3>Time Left / After Calculator</h3>
+    	    	 <label>Year: <input type="number" class="kac_gun" name="Year" min="1970" max="2038" value="2023" required> </label>
+    	        <label>Month: <input type="number" class="kac_gun" name="Month" min="1" max="12" value="10" required> </label>
+	            <label>Day: <input type="number" class="kac_gun" name="Day" min="1" max="31" value="08" required> </label>
+            	<button onclick="kac_gun()">Calc.</button>
+        	    <p id="kac_gun_sonuc"></p>
+			</center>
+        </div>
+        <div id="gun_say" class="col  col-sm-4 border border-success border-4 mx-1 my-1">
+			<center>
+				<h3>Enter Number And Calculate The Date</h3>
+            	<label>Please Enter A Number For The Calculation (-/+ is accepted):</label>
+            	<input type="number" class="gun_say" name="days" value="1"  required>
+				<button onclick="gun_say()">Calc.</button>
+            	<p id="gun_say_sonuc"></p>
+			</center>
+        </div>
+        <div id="geri_say" class="col  col-sm-4 border border-warning border-4 mx-1 my-1">
+            <center>
+				<h3 >Countdown Timer With Progress Bar</h3>
+				<label>Enter A Number In The Countdown Timer (Minutes):</label>
+    	        <p id="geri_say_goster" value="0"></p>
+    	        <input type="number" class="geri_say" name="number" value="1" min="1" required>
+	            <button onclick="geri_say()">Calc</button>
+			</center>
+    	</div>
+	</div>
+</div>
+</body>
+<script type="text/javascript">
+	function saniye(veri){
+		g = Math.floor(veri / 86400);
+		s = Math.floor(veri / 3600 % 24);
+		d = Math.floor(veri / 60 % 60);
+		sn = Math.floor(veri % 60);
+		return (`<span style="color:red">${g}</span> Days  <span style="color:red">${s}</span> Hours  <span style="color:red">${d}</span> Minutes  <span style="color:red">${sn}</span> Seconds `);
+	}
+
+	function check (dogrula, error){
+		for(i = 0; i< dogrula.length; i++){
+			if (!dogrula[i].checkValidity()){
+				error.push("Error => " + dogrula[i].name + " | Reason => " + dogrula[i].validationMessage+"\r\n");
+			}
+		}
+	}
+
+	function kac_gun(){
+		var error = [];
+		let dogrula = document.getElementsByClassName('kac_gun');
+		check (dogrula,error);
+		if (error.length !== 0) {
+			alert(error);
+		} else {
+			let tarih = []
+			for (index=0; index < dogrula.length; index++){
+				tarih.push(dogrula[index].value);
+			}
+			let yaz = "";
+			for (i in tarih) {yaz += (`${tarih[i]} `)};
+			let kgt   = Math.floor(new Date(yaz).getTime() / 1000);
+			let suan = Math.floor(new Date().getTime() / 1000);		
+			if (kgt > suan){
+				let sonuc = (kgt - suan);
+				document.getElementById("kac_gun_sonuc").innerHTML = (`<strong>${saniye(sonuc)} Left.</strong>`);
+				}else {
+					let sonuc = (suan - kgt);
+					document.getElementById("kac_gun_sonuc").innerHTML = (`<strong>${saniye(sonuc)} Passed.</strong>`);
+				}
+		}
+	}
+
+	function gun_say (){
+		var error = [];
+		let dogrula = document.getElementsByClassName('gun_say');
+		check(dogrula,error);
+		if (error.length !== 0) {
+			alert(error);
+		} else{
+			let days = dogrula[0].value;
+    		let hsp = new Date().getTime() + (days * 86400000);
+			let zmn = new Date(hsp);
+			let sec = document.getElementById("gun_say_sonuc");
+			if (days === "0"){ sec.innerHTML = `<strong>Please enter a number other than zero (<span style="color:red">${days}</span>)<strong>`;
+			}else{
+				sec.innerHTML = (`<span style="color:red; font-weight: bold;">${zmn.getDate()}/${zmn.getMonth()+1}/${zmn.getFullYear()}</span>`)
+			}
+		}
+	}
+
+	function geri_say(){
+		var error = [];
+		let dogrula = document.getElementsByClassName('geri_say');
+		check (dogrula,error);
+		if (error.length !== 0) {
+				alert(error);
+			} else{
+				if (typeof sayac === 'number'){ 
+					clearInterval(sayac);
+					sayac = undefined;
+				console.log("Timer Cleared");
+				}
+				let sayi = dogrula[0].value *60;
+				let pBar = sayi;
+				sayac =setInterval(()=>{
+					if (sayi > 0){
+						sayi -= 1
+						document.getElementById('geri_say_goster').innerHTML = `<strong>${saniye(sayi)}</strong><br><progress value="${sayi}" max="${pBar}"></progress>`;
+						}else{
+							clearInterval(sayac);
+							document.getElementById('geri_say_goster').innerHTML = '<strong><span style="color:red">The Time Is Over</span></strong><br><progress value="${sayi}" max="${pBar}"></progress>'
+							console.log("Time Ended: ", sayi);
+							}
+				},1000);
+				console.log("Timer Is Started.")
+			}
+	}
+</script>
+</html>
